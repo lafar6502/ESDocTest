@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Newtonsoft.Json;
 
-namespace InfoArc.Services.ES.QDSL
+namespace DocTest.Services.ES.QDSL
 {
     public class TermFilter : SimpleFilter
     {

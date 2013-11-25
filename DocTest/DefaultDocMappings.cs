@@ -9,6 +9,9 @@ using System.Linq.Expressions;
 
 namespace DocTest
 {
+    /// <summary>
+    /// Default document type mapping implementation
+    /// </summary>
     public class DefaultDocMappings : IDocMappings
     {
         internal class DocTypeInfoEntry
@@ -62,11 +65,6 @@ namespace DocTest
 
         public void RegisterDocumentType(Type t)
         {
-            ESDocumentTypeAttribute att = (ESDocumentTypeAttribute)Attribute.GetCustomAttribute(t, typeof(ESDocumentTypeAttribute));
-            if (att == null) throw new Exception("ESDocumentTypeAttribute");
-            if (_type2Types.ContainsKey(t)) return;
-            string tid = GetTypeId(t);
-            if (_id2Types.ContainsKey(tid)) throw new Exception("TypeId conflict for " + tid);
             var pi = t.GetProperty("Id");
             if (pi == null)
             {
@@ -75,11 +73,27 @@ namespace DocTest
             }
             //var dlg = Delegate.CreateDelegate(typeof(Func<object, string>), null, pi.GetGetMethod());
             var dlg = BuildIdAccessor(pi.GetGetMethod());
+            RegisterDocumentType(t, dlg);
+        }
+
+
+        public void RegisterDocumentType<T>(Func<T, string> getId)
+        {
+            RegisterDocumentType(typeof(T), x => getId((T)x));
+        }
+
+        public void RegisterDocumentType(Type t, Func<object, string> getId)
+        {
+            ESDocumentTypeAttribute att = (ESDocumentTypeAttribute)Attribute.GetCustomAttribute(t, typeof(ESDocumentTypeAttribute));
+            if (att == null) throw new Exception("ESDocumentTypeAttribute");
+            if (_type2Types.ContainsKey(t)) return;
+            string tid = GetTypeId(t);
+            if (_id2Types.ContainsKey(tid)) throw new Exception("TypeId conflict for " + tid);
             DocTypeInfoEntry e = new DocTypeInfoEntry
             {
                 DocType = t,
                 TypeId = tid.ToLower(),
-                GetId = (Func<object, string>) dlg
+                GetId = getId
             };
             _id2Types.TryAdd(e.TypeId, e);
             _type2Types.TryAdd(e.DocType, e);

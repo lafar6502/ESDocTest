@@ -5,7 +5,7 @@ using System.Text;
 using Newtonsoft.Json;
 using System.IO;
 
-namespace InfoArc.Services.ES.QDSL
+namespace DocTest.Services.ES.QDSL
 {
     public abstract class QueryBase : Statement
     {

@@ -6,6 +6,7 @@ using PlainElastic.Net;
 using PlainElastic.Net.Serialization;
 using DocTest.ES;
 using System.Collections.Concurrent;
+using QL = DocTest.Services.ES.QDSL;
 
 namespace DocTest
 {
@@ -120,10 +121,19 @@ namespace DocTest
         public IEnumerable<T> Search<T>(Func<dynamic, QueryNode> query, Func<dynamic, QueryNode> filter = null)
         {
             string index = _mappings.GetDefaultIndexName(typeof(T));
+            string dtype = _mappings.TypeId(typeof(T));
             string lq = LuceneQueryBuilder.DynQuery(query).ToString();
             string fq = filter == null ? null : LuceneQueryBuilder.DynQuery(filter).ToString();
 
-            throw new NotImplementedException();
+            var sr = new QL.SearchRequest {
+                Query = new QL.QueryString { Query = lq },
+                Filter = fq == null ? null : new QL.QueryFilter { Query = new QL.QueryString { Query = fq } }
+
+            };
+
+            var res = _conn.Post(Commands.Search(index, dtype).BuildCommand(), sr.ToJson());
+
+            return new List<T>();
         }
     }
 }

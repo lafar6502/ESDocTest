@@ -6,6 +6,9 @@ using System.Reflection;
 
 namespace DocTest
 {
+    /// <summary>
+    /// Lucene query AST node
+    /// </summary>
     public abstract class QueryNode
     {
         public AndNode And(QueryNode rhs)
@@ -179,9 +182,16 @@ namespace DocTest
         }
     }
 
+    /// <summary>
+    /// Field boolean condition
+    /// </summary>
     public class FieldPredicate : QueryNode
     {
         public Field Fld { get; set; }
+
+        /// <summary>
+        /// boolean operator types
+        /// </summary>
         public enum OperatorType
         {
             EQ,
@@ -274,6 +284,9 @@ namespace DocTest
         }
     }
 
+    /// <summary>
+    /// object field expression
+    /// </summary>
     public class Field
     {
         public string Name { get;set;}
@@ -328,6 +341,11 @@ namespace DocTest
                 l.Add(v);
             }
             return new FieldPredicate { Fld = this, Operator = FieldPredicate.OperatorType.IN, Value = l };
+        }
+
+        public FieldPredicate In<T>(params T[] values)
+        {
+            return In<T>((IEnumerable<T>)values);
         }
 
         public FieldPredicate Between<T>(T min, T max)

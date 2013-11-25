@@ -7,6 +7,12 @@ namespace DocTest
 {
     public class LuceneQueryBuilder
     {
+        /// <summary>
+        /// dynamic, linq-like query, for example
+        /// x => x.Name == "eddie" || x.Id.In(1, 2, 3, 4)
+        /// </summary>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
         public static QueryNode DynQuery(Func<dynamic, QueryNode> predicate)
         {
             var dq = new DynamicField();
@@ -53,7 +59,6 @@ namespace DocTest
             nn = nn && Field.Named("Role").In(new object[] { "a", "b", "c" });
             nn = nn && Field.Named("CreatedDate").Between((DateTime?)null, DateTime.Now.AddDays(10));
             var nn2 = QueryNode.Raw("UserId:[* TO *] AND Active:true") && Field.Named("Login").IsNull();
-
             DynQuery(x => x.Active == true && x.Login == "Das ist mein szajze");
 
         }

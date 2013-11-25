@@ -30,7 +30,8 @@ namespace DocTest
                     Email = "ziutek@test.org"
                 };
                 ses.InsertNew(ui);
-                ses.Search<Docs.UserInfo>(u => u.Name == "ziutek");
+                
+                ses.Search<Docs.UserInfo>(u => u.Name.In("ziutek", "franek"));
                 ses.SaveChanges();
             }
             
